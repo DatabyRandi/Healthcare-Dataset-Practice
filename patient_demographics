@@ -1,0 +1,303 @@
+Show first name and last name of patients who do not have allergies. (null)
+
+SELECT first_name, last_name
+FROM patients
+where allergies is NULL
+
+#How this can answer business problems or help a business out:
+Patient Safety: One of the primary concerns in healthcare is patient safety. 
+Knowing which patients have no recorded allergies is vital for providing safe 
+and appropriate medical care. By identifying patients without any known 
+allergies, healthcare providers can be more confident when administering 
+medications, treatments, or procedures, reducing the risk of adverse reactions.
+-----------------------------
+Show first name of patients that start with the letter 'C'
+
+select first_name
+FROM patients
+WHERE first_name like 'C%'
+-----------------------------
+Show first name and last name of patients that weigh within the range of 100 to 120 (inclusive)
+
+SELECT first_name, last_name
+FROM patients
+WHERE weight BETWEEN 100 AND 120
+-----------------------------
+Update the patients table for the allergies column. If the patient's allergies is null then replace it with 'NKA'
+
+UPDATE patients
+SET allergies = 'NKA'
+WHERE allergies is NULL
+-----------------------------
+Show first name and last name concatinated into one column to show their full name.
+
+SELECT CONCAT(first_name, ' ', last_name) as full_name
+FROM patients
+-----------------------------
+Show first name, last name, and the full province name of each patient.
+Example: 'Ontario' instead of 'ON'
+
+SELECT first_name, last_name, province_name
+FROM patients
+JOIN province_names ON province_names.province_id = patients.province_id
+-----------------------------
+Show how many patients have a birth_date with 2010 as the birth year.
+
+SELECT COUNT(patient_id)
+FROM patients
+WHERE birth_date like '2010%'
+-----------------------------
+Show the first_name, last_name, and height of the patient with the greatest height.
+
+SELECT first_name, last_name, MAX(height)
+FROM patients
+-----------------------------
+Show all columns for patients who have one of the following patient_ids:
+1,45,534,879,1000
+
+SELECT *
+FROM patients
+WHERE patient_id IN(1,45,534,879,1000)
+
+#How can this query answer business problems or help a business out:
+Monitoring High-Priority Patients: The query allows the business to easily 
+identify and monitor high-priority patients represented by the specified patient 
+IDs. For example, if these patient IDs correspond to critical or high-risk cases,
+healthcare providers can prioritize their care and allocate appropriate 
+resources.
+-----------------------------
+Show all columns for patients who have one of the following patient_ids:
+1,45,534,879,1000 where the allergies column is not null
+
+SELECT *
+FROM patients
+WHERE patient_id IN(1,45,534,879,1000)
+AND allergies is NOT NULL
+-----------------------------
+Show the total number of admissions
+
+SELECT COUNT(patient_id) AS total_admissions
+FROM admissions
+-----------------------------
+How many patients are still in the hospital (have not been discharged)?
+
+SELECT *
+FROM admissions
+WHERE discharge_date is NULL
+
+#How this can answer business problems or help a business out:
+Staffing and Nursing Ratios: Having an accurate count of patients still in the 
+hospital helps the business determine appropriate staffing levels and nursing 
+ratios. Adequate staffing is crucial for providing high-quality care and 
+maintaining patient safety.
+-----------------------------
+Show all the columns from admissions where the patient was admitted and discharged on the same day.
+
+SELECT *
+FROM admissions
+WHERE admission_date=discharge_date
+
+#How this can answer business problems or help a business out:
+Billing and Reimbursement Accuracy: The query can help ensure the accuracy of 
+billing and reimbursement processes. If patients are mistakenly recorded as 
+being admitted and discharged on the same day, it could impact billing and 
+reimbursement calculations. Identifying and correcting such cases can prevent 
+financial discrepancies.
+-----------------------------
+Are there any duplicates in the patient_id?
+
+SELECT COUNT(DISTINCT patient_id)
+FROM admissions
+
+SELECT COUNT(patient_id)
+FROM admissions
+-----------------------------
+Show the patient id and the total number of admissions for patient_id 579.
+
+SELECT patient_id, COUNT(admission_date) AS total_admissions
+FROM admissions
+WHERE patient_id = 579
+-----------------------------
+Based on the cities that our patients live in, show unique cities that are in province_id 'NS'?
+
+SELECT DISTINCT city
+FROM patients
+WHERE province_id = 'NS'
+-----------------------------
+Write a query to find the first_name, last name and birth date of patients who has height greater than 160 and weight greater than 70
+
+SELECT first_name, last_name, birth_date
+FROM patients
+WHERE height > 160
+AND weight > 70
+-----------------------------
+Write a query to find list of patients first_name, last_name, and allergies from Hamilton where allergies are not null
+
+SELECT first_name, last_name, allergies
+FROM patients
+WHERE city = 'Hamilton'
+AND allergies is NOT NULL
+-----------------------------
+Based on cities where our patient lives in, write a query to display the list of unique cities starting with a
+vowel (a, e, i, o, u). Show the result order in ascending by city.
+
+SELECT DISTINCT(city)
+FROM patients
+WHERE city like 'a%'
+OR city like 'e%'
+OR city like 'i%'
+OR city like 'o%'
+OR city like 'u%'
+ORDER BY city ASC;
+-----------------------------
+Show unique birth years from patients and order them by ascending.
+
+SELECT DISTINCT YEAR(birth_date) AS birth_year
+FROM patients
+ORDER BY birth_date ASC
+-----------------------------
+Show unique first names from the patients table which only occurs once in the list.
+For example, if two or more people are named 'John' in the first_name column then don't include their name in the output list.
+If only 1 person is named 'Leo' then include them in the output.
+
+SELECT first_name
+FROM patients
+GROUP BY first_name
+HAVING COUNT(first_name) =1
+-----------------------------
+Show patient_id and first_name from patients where their first_name start and ends with 's' and is at least 6 characters long.
+
+SELECT patient_id, first_name
+FROM patients
+WHERE first_name like 's___%s'
+      AND LEN(first_name) >=6
+-----------------------------
+Show patient_id, first_name, last_name from patients whos diagnosis is 'Dementia'.
+Primary diagnosis is stored in the admissions table.
+
+SELECT patients.patient_id, first_name, last_name
+FROM patients
+      JOIN admissions ON admissions.patient_id=patients.patient_id
+WHERE admissions.diagnosis = 'Dementia'
+---------------------------------
+Show the total amount of male patients and the total amount of female patients in the patients table.
+Display the two results in the same row.
+
+SELECT
+      (SELECT COUNT(gender) FROM patients WHERE gender='M') AS MALE_COUNT,
+    (SELECT COUNT(gender) FROM patients WHERE gender ='F') AS FEMALE_COUNT;
+
+#How this can answer business problems or help a business out: 
+Healthcare Service Planning: Understanding the gender distribution of patients 
+can influence healthcare service planning. Different genders may have different 
+health needs and preferences, and having this information can help the business 
+design appropriate services and programs.
+---------------------------------
+Show first and last name, allergies from patients which have allergies to either 'Penicillin' or 'Morphine'. Show results ordered ascending
+by allergies then by first_name then by last_name.
+
+SELECT first_name, last_name, allergies
+FROM patients
+WHERE allergies='Penicillin'
+OR allergies ='Morphine'
+ORDER BY
+      allergies,
+    first_name,
+    last_name
+---------------------------------
+Show patient_id, diagnosis from admissions. Find patients admitted multiple times for the same diagnosis.
+   
+SELECT patient_id, diagnosis
+FROM admissions
+GROUP BY patient_id, diagnosis
+Having COUNT(*) >1;
+---------------------------------
+Show the city and the total number of patients in the city.
+Order from most to least patients and then by city name ascending.
+
+SELECT city, COUNT(patient_id) AS num_patients
+FROM patients
+GROUP BY city
+ORDER BY
+      num_patients desc,
+    city ASC
+---------------------------------
+Show first name, last name and role of every person that is either patient or doctor.
+The roles are either "Patient" or "Doctor"
+
+SELECT first_name, last_name, 'Patient' AS role FROM patients
+UNION all
+SELECT first_name, last_name, 'Doctor' AS role FROM doctors
+---------------------------------
+Show all allergies ordered by popularity. Remove NULL values from query.
+
+SELECT allergies, COUNT(*) AS total_diagnosis
+FROM patients
+WHERE allergies is NOT NULL
+GROUP BY allergies
+ORDER BY total_diagnosis DESC
+---------------------------------
+Show all patient's first_name, last_name, and birth_date who were born in the 1970s decade. Sort the list starting from the earliest birth_date.
+
+SELECT first_name, last_name, birth_date
+FROM patients
+WHERE YEAR(birth_date) like '197%'
+ORDER BY birth_date ASC
+---------------------------------
+We want to display each patient's full name in a single column. Their last_name in all upper letters must appear first, then first_name
+in all lower case letters. Separate the last_name and first_name with a comma. Order the list by the first_name in decending order
+EX: SMITH,jane
+
+SELECT CONCAT(UPPER(last_name),',',LOWER(first_name)) AS full_name_updated_format
+FROM patients
+ORDER BY first_name DESC
+---------------------------------
+------------------------
+Show the province_id(s), sum of height; where the total sum of its patient's height is greater than or equal to 7,000.
+
+SELECT province_id, SUM(height) AS sum_height
+FROM patients
+GROUP BY province_id
+HAVING sum_height >= 7000
+------------------------
+Show the difference between the largest weight and smallest weight for patients with the last name 'Maroni'
+
+SELECT MAX(weight)-MIN(weight) AS weight_delta
+FROM patients
+WHERE last_name = 'Maroni'
+------------------------
+How many patients have the last name 'Maroni'?
+
+SELECT COUNT(patient_id)
+FROM patients
+WHERE last_name = 'Maroni'
+------------------------
+Show all of the days of the month (1-31) and how many admission_dates occurred on that day. Sort by the day with most admissions to
+least admissions.
+
+SELECT DAY(admission_date), COUNT(admission_date)
+FROM admissions
+GROUP BY DAY(admission_date)
+ORDER BY COUNT(admission_date) DESC
+------------------------
+Show all columns for patient_id 542's most recent admission_date.
+
+SELECT *
+FROM admissions
+WHERE patient_id = 542
+GROUP BY patient_id
+HAVING MAX(admission_date)
+------------------------
+Show patient_id, attending_doctor_id, and diagnosis for admissions that match one of the two criteria:
+1. patient_id is an odd number and attending_doctor_id is either 1, 5, or 19.
+2. attending_doctor_id contains a 2 and the length of patient_id is 3 characters.
+
+SELECT patient_id, attending_doctor_id, diagnosis
+FROM admissions
+WHERE
+      (attending_doctor_id in (1,5,19)
+     AND patient_id % 2 !=0)
+or
+      (attending_doctor_id LIKE '%2%'
+     AND LEN(patient_id) =3
+     )
